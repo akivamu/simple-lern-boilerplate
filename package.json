@@ -6,6 +6,7 @@
   "author": "akivamu",
   "license": "MIT",
   "scripts": {
+    "test": "mocha server-test/index.js",
     "start": "node index"
   },
   "dependencies": {
@@ -14,5 +15,10 @@
     "express-session": "^1.15.2",
     "lowdb": "^0.16.0",
     "session-file-store": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "mocha": "^3.2.0"
   }
 }
