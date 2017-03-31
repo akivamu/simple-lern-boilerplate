@@ -1,0 +1,41 @@
+'use strict';
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const session = require('./session');
+const dbService = require('./services/db');
+
+class Server {
+    constructor(config) {
+        this.config = config;
+
+        console.log('Creating server:');
+        console.log('   Host:          ' + config.host);
+        console.log('   Port:          ' + config.port);
+
+        dbService.init(this.config.databaseFileName);
+
+        this.app = express();
+
+        this.app.use(session(this.config.sessionCookieIdName));
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({extended: true}));
+
+        // Rest
+        this.app.use('/rest/auth', require('./rest/auth'));
+        this.app.use('/', require('./rest/common'));
+    }
+
+    start(done) {
+        const that = this;
+        this.app.listen(this.config.port, this.config.host, function onStart(err) {
+            if (err) {
+                console.log(err);
+            }
+            console.info('==> Listening on http://%s:%s', that.config.host, that.config.port);
+            done && done();
+        });
+    };
+}
+
+module.exports = Server;

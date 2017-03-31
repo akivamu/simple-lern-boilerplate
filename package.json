@@ -1,0 +1,18 @@
+{
+  "name": "simple-lern-boilerplate",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:akivamu/simple-lern-boilerplate.git",
+  "author": "akivamu",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "express": "^4.15.2",
+    "express-session": "^1.15.2",
+    "lowdb": "^0.16.0",
+    "session-file-store": "^1.0.0"
+  }
+}
