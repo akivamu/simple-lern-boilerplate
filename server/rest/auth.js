@@ -5,11 +5,18 @@ const authService = require('../services/auth');
 const sessionService = require('../services/session');
 const db = require('../services/db').get();
 
+function removeSensitiveAccountProps(account) {
+    return {
+        username: account.username,
+        roles: account.roles
+    };
+}
+
 router.post('/login', function (req, res) {
     // Already logged in
     const currentAccount = authService.getCurrentAccount(req);
     if (currentAccount) {
-        res.json(currentAccount);
+        res.json(removeSensitiveAccountProps(currentAccount));
         return;
     }
 
@@ -19,7 +26,7 @@ router.post('/login', function (req, res) {
     }).value();
     if (account) {
         req.session.account = account;
-        res.json(account);
+        res.json(removeSensitiveAccountProps(account));
         return;
     }
 
@@ -30,7 +37,7 @@ router.get('/sync', function (req, res) {
     // Already logged in
     const currentAccount = authService.getCurrentAccount(req);
     if (currentAccount) {
-        res.json(currentAccount);
+        res.json(removeSensitiveAccountProps(currentAccount));
     } else {
         res.json({});
     }
