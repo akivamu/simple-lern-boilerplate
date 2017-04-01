@@ -4,6 +4,7 @@ const router = require('express').Router();
 const authService = require('../services/auth');
 const sessionService = require('../services/session');
 const db = require('../services/db').get();
+const ExpressBrute = require('express-brute');
 
 function removeSensitiveAccountProps(account) {
     return {
@@ -12,7 +13,14 @@ function removeSensitiveAccountProps(account) {
     };
 }
 
-router.post('/login', function (req, res) {
+const bruteforce = new ExpressBrute(new ExpressBrute.MemoryStore(), {
+        freeRetries: 3,
+        minWait: 5 * 60 * 1000,
+        maxWait: 60 * 60 * 1000
+    }
+);
+
+router.post('/login', bruteforce.prevent, function (req, res) {
     // Already logged in
     const currentAccount = authService.getCurrentAccount(req);
     if (currentAccount) {

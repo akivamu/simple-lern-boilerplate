@@ -41,3 +41,5 @@ jspm_packages
 yarn.lock
 sessions
 db.json
+dist
+web/bundle-analyzer-report.html

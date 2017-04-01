@@ -4,11 +4,6 @@ const router = require('express').Router();
 const db = require('../services/db').get();
 const authService = require('../services/auth');
 
-router.get('/', function (req, res, next) {
-    // TODO: handle request
-    res.send('OK');
-});
-
 router.get('/init', function (req, res) {
     if (db.get('accounts').size().value() > 0) {
         res.status(409).json({error: 'Already initialized'});
