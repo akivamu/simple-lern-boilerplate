@@ -28,7 +28,7 @@ class Server {
 
     start(done) {
         const that = this;
-        this.app.listen(this.config.port, this.config.host, function onStart(err) {
+        this.httpServer = this.app.listen(this.config.port, this.config.host, function onStart(err) {
             if (err) {
                 console.log(err);
             }
@@ -36,6 +36,14 @@ class Server {
             done && done();
         });
     };
+
+    stop(done) {
+        this.httpServer.close(done);
+    }
+
+    getExpressApp() {
+        return this.app;
+    }
 }
 
 module.exports = Server;

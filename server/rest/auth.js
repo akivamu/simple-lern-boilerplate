@@ -25,4 +25,27 @@ router.post('/login', function (req, res) {
     res.status(401).json({error: 'Username and password are incorrect'});
 });
 
+router.get('/sync', function (req, res) {
+    // Already logged in
+    const currentAccount = authService.getCurrentAccount(req);
+    if (currentAccount) {
+        res.json(currentAccount);
+    } else {
+        res.json({});
+    }
+});
+
+router.get('/logout', authService.requireAuthentication, function (req, res) {
+    req.session.destroy(function (err) {
+        if (err) {
+            console.error(err);
+            res.sendStatus(500);
+        } else {
+            // TODO : refactor session + auth service
+            res.clearCookie('sid');
+            res.sendStatus(200);
+        }
+    });
+});
+
 module.exports = router;
