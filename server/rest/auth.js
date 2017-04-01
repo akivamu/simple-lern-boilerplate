@@ -2,6 +2,7 @@
 
 const router = require('express').Router();
 const authService = require('../services/auth');
+const sessionService = require('../services/session');
 const db = require('../services/db').get();
 
 router.post('/login', function (req, res) {
@@ -41,8 +42,7 @@ router.get('/logout', authService.requireAuthentication, function (req, res) {
             console.error(err);
             res.sendStatus(500);
         } else {
-            // TODO : refactor session + auth service
-            res.clearCookie('sid');
+            res.clearCookie(sessionService.sessionCookieIdName);
             res.sendStatus(200);
         }
     });

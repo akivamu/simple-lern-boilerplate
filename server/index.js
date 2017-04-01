@@ -2,7 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const session = require('./session');
+const sessionService = require('./services/session');
 const dbService = require('./services/db');
 
 class Server {
@@ -17,7 +17,7 @@ class Server {
 
         this.app = express();
 
-        this.app.use(session(this.config.sessionCookieIdName));
+        this.app.use(sessionService.init(this.config.sessionCookieIdName));
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: true}));
 
