@@ -60,6 +60,16 @@ describe('Authentication', () => {
                     });
             })
     });
+    it('it fail to resume auth session when not logged in', (done) => {
+        const agent = chai.request.agent(server.getExpressApp());
+        agent.get('/rest/auth/sync')
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.a('object');
+                expect(res.body).to.be.empty;
+                done();
+            });
+    });
     it('it success to logout', (done) => {
         const agent = chai.request.agent(server.getExpressApp());
         agent.post('/rest/auth/login')
