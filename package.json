@@ -6,19 +6,22 @@
   "author": "akivamu",
   "license": "MIT",
   "scripts": {
-    "test": "mocha server-test/index.js",
+    "test": "export NODE_ENV=test && mocha server-test/index.js",
     "start:dev": "export NODE_ENV=development && node index",
     "dist": "rimraf web/dist && webpack -p --config web/webpack.prod.config.js --progress --profile --colors",
     "prestart": "npm install",
-    "start": "export NODE_ENV=production  && npm run dist && node index"
+    "start": "export NODE_ENV=production && npm run dist && node index"
   },
   "dependencies": {
     "body-parser": "^1.17.1",
+    "config": "^1.25.1",
     "express": "^4.15.2",
     "express-brute": "^1.0.1",
     "express-session": "^1.15.2",
     "lowdb": "^0.16.0",
-    "session-file-store": "^1.0.0"
+    "session-file-store": "^1.0.0",
+    "winston": "^2.3.1",
+    "winston-daily-rotate-file": "^1.4.6"
   },
   "devDependencies": {
     "axios": "^0.16.0",

@@ -2,6 +2,7 @@
 
 const low = require('lowdb');
 const fileAsync = require('lowdb/lib/storages/file-async');
+const logger = require('../logger')(module);
 
 let fileName = '';
 let lowDb = undefined;
@@ -13,7 +14,7 @@ const DEFAULT_SCHEMA = {
 module.exports = {
     init: function (dbFileName) {
         if (this.isInitialized()) {
-            console.error('Already initialized: ' + fileName);
+            logger.error('Already initialized: ' + fileName);
             return;
         }
 
@@ -32,7 +33,7 @@ module.exports = {
     },
     clear: function () {
         if (!this.isInitialized()) {
-            console.error('Not initialize');
+            logger.error('Not initialize');
             return;
         }
         lowDb.get('accounts').remove().write();

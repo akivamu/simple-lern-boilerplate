@@ -5,6 +5,7 @@ const authService = require('../services/auth');
 const sessionService = require('../services/session');
 const db = require('../services/db').get();
 const ExpressBrute = require('express-brute');
+const logger = require('../logger')(module);
 
 function removeSensitiveAccountProps(account) {
     return {
@@ -54,7 +55,7 @@ router.get('/sync', function (req, res) {
 router.get('/logout', authService.requireAuthentication, function (req, res) {
     req.session.destroy(function (err) {
         if (err) {
-            console.error(err);
+            logger.error(err);
             res.sendStatus(500);
         } else {
             res.clearCookie(sessionService.sessionCookieIdName);

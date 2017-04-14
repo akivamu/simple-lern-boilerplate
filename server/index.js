@@ -4,14 +4,15 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const sessionService = require('./services/session');
 const dbService = require('./services/db');
+const logger = require('./logger')(module);
 
 class Server {
     constructor(config) {
         this.config = config;
 
-        console.log('Creating server:');
-        console.log('   Host:          ' + config.host);
-        console.log('   Port:          ' + config.port);
+        logger.info('Creating server:');
+        logger.info('   Host:          ' + config.host);
+        logger.info('   Port:          ' + config.port);
 
         dbService.init(this.config.databaseFileName);
 
@@ -30,9 +31,9 @@ class Server {
         const that = this;
         this.httpServer = this.app.listen(this.config.port, this.config.host, function onStart(err) {
             if (err) {
-                console.log(err);
+                logger.error(err);
             }
-            console.info('==> Listening on http://%s:%s', that.config.host, that.config.port);
+            logger.info('==> Listening on http://%s:%s', that.config.host, that.config.port);
             done && done();
         });
     };
