@@ -1,5 +1,6 @@
 "use strict";
 
+const _ = require('lodash');
 const low = require('lowdb');
 const fileAsync = require('lowdb/lib/storages/file-async');
 const logger = require('../logger')(module);
@@ -36,7 +37,9 @@ module.exports = {
             logger.error('Not initialize');
             return;
         }
-        lowDb.get('accounts').remove().write();
-        lowDb.get('links').remove().write();
+
+        DEFAULT_SCHEMA.forEach(function (name) {
+            lowDb.get(name).remove().write();
+        });
     }
 };
