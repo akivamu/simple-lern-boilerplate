@@ -25,6 +25,7 @@ router.post('/login', bruteforce.prevent, function (req, res) {
     // Already logged in
     const currentAccount = authService.getCurrentAccount(req);
     if (currentAccount) {
+        req.brute.reset();
         res.json(removeSensitiveAccountProps(currentAccount));
         return;
     }
@@ -34,6 +35,7 @@ router.post('/login', bruteforce.prevent, function (req, res) {
         password: req.body.password
     }).value();
     if (account) {
+        req.brute.reset();
         req.session.account = account;
         res.json(removeSensitiveAccountProps(account));
         return;
