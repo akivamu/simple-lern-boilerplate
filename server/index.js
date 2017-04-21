@@ -10,7 +10,7 @@ class Server {
     constructor(config) {
         this.config = config;
 
-        logger.info('Creating server:');
+        logger.info('Creating server for ' + config.env);
         logger.info('   Host:          ' + config.host);
         logger.info('   Port:          ' + config.port);
 
@@ -24,6 +24,7 @@ class Server {
 
         // Rest
         this.app.use('/rest/auth', require('./rest/auth'));
+        this.app.use('/rest/accounts', require('./rest/accounts'));
         this.app.use('/', require('./rest/common'));
     }
 
