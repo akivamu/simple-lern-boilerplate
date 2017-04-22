@@ -3,7 +3,7 @@
 const router = require('express').Router();
 const authService = require('../services/auth');
 const sessionService = require('../services/session');
-const db = require('../services/db').get();
+const dbService = require('../services/db');
 const ExpressBrute = require('express-brute');
 const logger = require('../logger')(module);
 
@@ -30,7 +30,7 @@ router.post('/login', bruteforce.prevent, function (req, res) {
         return;
     }
 
-    db.get('accounts', {username: req.body.username})
+    dbService.get().get('accounts', {username: req.body.username})
         .then((account) => {
             if (account
                 && account.username === req.body.username

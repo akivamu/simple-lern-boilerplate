@@ -68,9 +68,7 @@ class LowDb {
     }
 
     clear() {
-        DEFAULT_SCHEMA.forEach(function (name) {
-            this.lowDb.get(name).remove().write();
-        });
+        this.lowDb.setState({});
     }
 }
 

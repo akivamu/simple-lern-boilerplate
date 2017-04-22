@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require('../services/db').get(),
+const dbService = require('../services/db'),
     auth = require('../services/auth'),
     requireAuthentication = auth.requireAuthentication,
     requireAuthorization = auth.requireAuthorization,
@@ -10,7 +10,7 @@ router.all('*', requireAuthentication);
 router.all('*', requireAuthorization([auth.ROLES.ADMIN]));
 
 router.get('/', function (req, res) {
-    db.get('accounts').then((accounts) => res.json(accounts));
+    dbService.get().get('accounts').then((accounts) => res.json(accounts));
 });
 
 router.post('/', function (req, res) {
@@ -19,25 +19,25 @@ router.post('/', function (req, res) {
     if (!auth.validateRoles(newAccount.roles)) {
         res.status(400).send('Invalid roles');
     } else {
-        db.get('accounts', {username: newAccount.username})
+        dbService.get().get('accounts', {username: newAccount.username})
             .then((existedAccount) => {
                 if (existedAccount) {
                     res.status(400).send('Username existed');
                 } else {
-                    db.post('accounts', newAccount).then(() => res.json(newAccount));
+                    dbService.get().post('accounts', newAccount).then(() => res.json(newAccount));
                 }
             });
     }
 });
 
 router.patch('/', function (req, res) {
-    db.get('accounts', {username: newAccount.username})
+    dbService.get().get('accounts', {username: newAccount.username})
         .then((existedAccount) => {
             if (existedAccount) {
                 if (!auth.validateRoles(req.body.roles)) {
                     res.status(400).send('Invalid roles');
                 } else {
-                    db.patch('accounts', {username: req.body.username}, {
+                    dbService.get().patch('accounts', {username: req.body.username}, {
                         password: req.body.password,
                         roles: req.body.roles
                     }).then(() => res.sendStatus(200));
@@ -49,7 +49,7 @@ router.patch('/', function (req, res) {
 });
 
 router.delete('/:username', function (req, res) {
-    db.delete('accounts', {username: req.params.username}).then(() => res.sendStatus(200));
+    dbService.get().delete('accounts', {username: req.params.username}).then(() => res.sendStatus(200));
 });
 
 module.exports = router;

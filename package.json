@@ -18,6 +18,7 @@
     "express": "^4.15.2",
     "express-brute": "^1.0.1",
     "express-session": "^1.15.2",
+    "fs-extra": "^2.1.2",
     "lowdb": "^0.16.0",
     "react-bootstrap-table": "^3.2.1",
     "session-file-store": "^1.0.0",

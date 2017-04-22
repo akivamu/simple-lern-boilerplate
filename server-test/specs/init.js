@@ -1,19 +1,26 @@
 "use strict";
 
 const fs = require('fs');
+const config = require('config');
+const Server = require('../../server');
+const dbService = require('../../server/services/db');
 
 const chai = require('chai');
 const should = chai.should();
 const expect = chai.expect;
 chai.use(require('chai-http'));
 
-const config = require('config');
-const Server = require('../../server');
-const server = new Server(config.server);
+module.exports = describe('Setup app for first time', function () {
+    let server = undefined;
 
-describe('Setup app for first time', () => {
     before(function (done) {
-        fs.unlinkSync(config.database.lowdb.databaseFileName);
+        if (fs.existsSync(config.database.lowdb.databaseFileName)) {
+            fs.unlinkSync(config.database.lowdb.databaseFileName);
+        }
+
+        dbService.init(config.server.dbType);
+
+        server = new Server(config.server);
         server.start(done);
     });
 
@@ -49,7 +56,9 @@ describe('Setup app for first time', () => {
     });
 
     after(function (done) {
-        fs.unlinkSync(config.database.lowdb.databaseFileName);
+        if (fs.existsSync(config.database.lowdb.databaseFileName)) {
+            fs.unlinkSync(config.database.lowdb.databaseFileName);
+        }
         server.stop(done);
     })
 });

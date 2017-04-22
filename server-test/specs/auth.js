@@ -1,19 +1,29 @@
 "use strict";
 
-const fs = require('fs');
+const fs = require('fs-extra');
+const path = require('path');
+const config = require('config');
+const Server = require('../../server');
+const dbService = require('../../server/services/db');
 
 const chai = require('chai');
 const should = chai.should();
 const expect = chai.expect;
 chai.use(require('chai-http'));
 
-const config = require('config');
-const Server = require('../../server');
-const server = new Server(config.server);
+module.exports = describe('Authentication', function () {
+    let server = undefined;
+    const DB_FILE_PATH = __dirname + '/../resources/db.test.json';
 
-describe('Authentication', () => {
     before(function (done) {
-        fs.createReadStream(__dirname + '/../resources/' + config.database.lowdb.databaseFileName).pipe(fs.createWriteStream(config.database.lowdb.databaseFileName));
+        if (fs.existsSync(config.database.lowdb.databaseFileName)) {
+            fs.unlinkSync(config.database.lowdb.databaseFileName);
+        }
+        fs.copySync(path.resolve(DB_FILE_PATH), config.database.lowdb.databaseFileName);
+
+        dbService.init(config.server.dbType);
+
+        server = new Server(config.server);
         server.start(done);
     });
 
@@ -96,7 +106,9 @@ describe('Authentication', () => {
     });
 
     after(function (done) {
-        fs.unlinkSync(config.database.lowdb.databaseFileName);
+        if (fs.existsSync(config.database.lowdb.databaseFileName)) {
+            fs.unlinkSync(config.database.lowdb.databaseFileName);
+        }
         server.stop(done);
     })
 });
