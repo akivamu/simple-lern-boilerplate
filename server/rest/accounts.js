@@ -1,10 +1,11 @@
 "use strict";
 
-const dbService = require('../services/db'),
-    auth = require('../services/auth'),
-    requireAuthentication = auth.requireAuthentication,
-    requireAuthorization = auth.requireAuthorization,
-    router = require('express').Router();
+const dbService = require('../services/db');
+const auth = require('../services/auth');
+const requireAuthentication = auth.requireAuthentication;
+const requireAuthorization = auth.requireAuthorization;
+const router = require('express').Router();
+const logger = require('../logger')(module);
 
 router.all('*', requireAuthentication);
 router.all('*', requireAuthorization([auth.ROLES.ADMIN]));
@@ -17,21 +18,23 @@ router.post('/', function (req, res) {
     const newAccount = req.body;
 
     if (!auth.validateRoles(newAccount.roles)) {
+        logger.error('create new account: invalid roles');
         res.status(400).send('Invalid roles');
     } else {
         dbService.get().get('accounts', {username: newAccount.username})
             .then((existedAccount) => {
                 if (existedAccount) {
+                    logger.error('create new account: Username existed');
                     res.status(400).send('Username existed');
                 } else {
-                    dbService.get().post('accounts', newAccount).then(() => res.json(newAccount));
+                    dbService.get().post('accounts', newAccount).then((result) => res.json(result));
                 }
             });
     }
 });
 
 router.patch('/', function (req, res) {
-    dbService.get().get('accounts', {username: newAccount.username})
+    dbService.get().get('accounts', {username: req.body.username})
         .then((existedAccount) => {
             if (existedAccount) {
                 if (!auth.validateRoles(req.body.roles)) {
@@ -49,7 +52,9 @@ router.patch('/', function (req, res) {
 });
 
 router.delete('/:username', function (req, res) {
-    dbService.get().delete('accounts', {username: req.params.username}).then(() => res.sendStatus(200));
+    dbService.get().delete('accounts', {username: req.params.username})
+        .then(() => res.sendStatus(200))
+        .catch((error) => res.status(500).send(error));
 });
 
 module.exports = router;

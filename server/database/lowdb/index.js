@@ -62,8 +62,12 @@ class LowDb {
 
     delete(type, match) {
         return new Promise((resolve, reject) => {
-            this.lowDb.get(type).remove(match).write();
-            resolve();
+            if (this.lowDb.get(type).find(match).value()) {
+                this.lowDb.get(type).remove(match).write();
+                resolve();
+            } else {
+                reject('Item not found');
+            }
         });
     }
 
