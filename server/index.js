@@ -3,7 +3,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const sessionService = require('./services/session');
-const dbService = require('./services/db');
 const logger = require('./logger')(module);
 
 class Server {
@@ -13,8 +12,6 @@ class Server {
         logger.info('Creating server for ' + config.env);
         logger.info('   Host:          ' + config.host);
         logger.info('   Port:          ' + config.port);
-
-        dbService.init(this.config.databaseFileName);
 
         this.app = express();
 

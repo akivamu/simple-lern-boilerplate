@@ -23,30 +23,30 @@ const bruteforce = new ExpressBrute(new ExpressBrute.MemoryStore(), {
 
 router.post('/login', bruteforce.prevent, function (req, res) {
     // Already logged in
-    const currentAccount = authService.getCurrentAccount(req);
+    const currentAccount = req.session && req.session.account ? req.session.account : null;
     if (currentAccount) {
         req.brute.reset();
         res.json(removeSensitiveAccountProps(currentAccount));
         return;
     }
 
-    const account = db.get('accounts').find({
-        username: req.body.username,
-        password: req.body.password
-    }).value();
-    if (account) {
-        req.brute.reset();
-        req.session.account = account;
-        res.json(removeSensitiveAccountProps(account));
-        return;
-    }
-
-    res.status(401).json({error: 'Username and password are incorrect'});
+    db.get('accounts', {username: req.body.username})
+        .then((account) => {
+            if (account
+                && account.username === req.body.username
+                && account.password === req.body.password) {
+                req.brute.reset();
+                req.session.account = account;
+                res.json(removeSensitiveAccountProps(account));
+            } else {
+                res.status(401).json({error: 'Username and password are incorrect'});
+            }
+        });
 });
 
 router.get('/sync', function (req, res) {
     // Already logged in
-    const currentAccount = authService.getCurrentAccount(req);
+    const currentAccount = req.session && req.session.account ? req.session.account : null;
     if (currentAccount) {
         res.json(removeSensitiveAccountProps(currentAccount));
     } else {

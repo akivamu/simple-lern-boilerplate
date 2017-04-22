@@ -13,7 +13,7 @@ const server = new Server(config.server);
 
 describe('Authentication', () => {
     before(function (done) {
-        fs.createReadStream(__dirname + '/../resources/' + config.server.databaseFileName).pipe(fs.createWriteStream(config.server.databaseFileName));
+        fs.createReadStream(__dirname + '/../resources/' + config.database.lowdb.databaseFileName).pipe(fs.createWriteStream(config.database.lowdb.databaseFileName));
         server.start(done);
     });
 
@@ -96,7 +96,7 @@ describe('Authentication', () => {
     });
 
     after(function (done) {
-        fs.unlinkSync(config.server.databaseFileName);
+        fs.unlinkSync(config.database.lowdb.databaseFileName);
         server.stop(done);
     })
 });

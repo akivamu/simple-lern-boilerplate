@@ -13,7 +13,7 @@ const server = new Server(config.server);
 
 describe('Setup app for first time', () => {
     before(function (done) {
-        fs.unlinkSync(config.server.databaseFileName);
+        fs.unlinkSync(config.database.lowdb.databaseFileName);
         server.start(done);
     });
 
@@ -40,7 +40,7 @@ describe('Setup app for first time', () => {
     });
     it('it fail to re init first account', (done) => {
         chai.request(server.getExpressApp())
-            .get('/init?username=a&password=a')
+            .get('/init?u=admin&p=admin')
             .end((err, res) => {
                 expect(res).to.have.status(409);
                 expect(res.body).to.be.a('object');
@@ -49,7 +49,7 @@ describe('Setup app for first time', () => {
     });
 
     after(function (done) {
-        fs.unlinkSync(config.server.databaseFileName);
+        fs.unlinkSync(config.database.lowdb.databaseFileName);
         server.stop(done);
     })
 });

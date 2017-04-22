@@ -1,5 +1,7 @@
 module.exports = {
-    server: {
-        databaseFileName: 'db.test.json'
+    database: {
+        lowdb: {
+            databaseFileName: 'db.test.json'
+        }
     }
 };

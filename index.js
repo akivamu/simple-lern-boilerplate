@@ -1,7 +1,10 @@
 const path = require('path');
 const config = require('config');
-const Server = require('./server');
 
+const dbService = require('./server/services/db');
+dbService.init(config.server.dbType);
+
+const Server = require('./server');
 const server = new Server(config.server);
 
 switch (config.web.env) {

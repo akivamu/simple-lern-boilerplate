@@ -8,13 +8,6 @@ module.exports = {
         ADMIN: 'ADMIN',
         USER: 'USER'
     },
-    getCurrentAccount: function (req) {
-        if (req.session && req.session.account) {
-            const existedAccount = db.get('accounts').find({username: req.session.account.username}).value();
-            if (existedAccount) return existedAccount;
-        }
-        return null;
-    },
     validateRoles: function (roles) {
         return _.intersection(roles, _.keys(this.ROLES)).length === roles.length;
     },

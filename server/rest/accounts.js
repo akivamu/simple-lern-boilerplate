@@ -10,7 +10,7 @@ router.all('*', requireAuthentication);
 router.all('*', requireAuthorization([auth.ROLES.ADMIN]));
 
 router.get('/', function (req, res) {
-    res.json(db.get('accounts').value());
+    db.get('accounts').then((accounts) => res.json(accounts));
 });
 
 router.post('/', function (req, res) {
@@ -19,45 +19,37 @@ router.post('/', function (req, res) {
     if (!auth.validateRoles(newAccount.roles)) {
         res.status(400).send('Invalid roles');
     } else {
-        const existedAccount = db.get('accounts').find({username: newAccount.username}).value();
-
-        if (existedAccount) {
-            res.status(400).send('Username existed');
-        } else {
-            db.get('accounts').push(newAccount).write();
-            res.json(newAccount);
-        }
+        db.get('accounts', {username: newAccount.username})
+            .then((existedAccount) => {
+                if (existedAccount) {
+                    res.status(400).send('Username existed');
+                } else {
+                    db.post('accounts', newAccount).then(() => res.json(newAccount));
+                }
+            });
     }
 });
 
 router.patch('/', function (req, res) {
-    const existedAccount = db.get('accounts').find({username: req.body.username}).value();
-    if (existedAccount) {
-        if (!auth.validateRoles(req.body.roles)) {
-            res.status(400).send('Invalid roles');
-        } else {
-            db.get('accounts')
-                .find({
-                    username: req.body.username
-                })
-                .assign({
-                    password: req.body.password,
-                    roles: req.body.roles
-                })
-                .write();
-
-            res.sendStatus(200);
-        }
-    } else {
-        res.status(400).send('Account not existed: ' + req.body.username);
-    }
+    db.get('accounts', {username: newAccount.username})
+        .then((existedAccount) => {
+            if (existedAccount) {
+                if (!auth.validateRoles(req.body.roles)) {
+                    res.status(400).send('Invalid roles');
+                } else {
+                    db.patch('accounts', {username: req.body.username}, {
+                        password: req.body.password,
+                        roles: req.body.roles
+                    }).then(() => res.sendStatus(200));
+                }
+            } else {
+                res.status(400).send('Account not existed: ' + req.body.username);
+            }
+        });
 });
 
 router.delete('/:username', function (req, res) {
-    const account = req.body;
-
-    db.get('accounts').remove({username: req.params.username}).write();
-    res.sendStatus(200);
+    db.delete('accounts', {username: req.params.username}).then(() => res.sendStatus(200));
 });
 
 module.exports = router;
