@@ -30,7 +30,7 @@ export default class AccountsView extends React.Component {
 
     onDeleteRow(rows) {
         rows.forEach(function (username) {
-            axios.delete('/rest/accounts', {username: username});
+            axios.delete('/rest/accounts/' + username);
         });
     }
 

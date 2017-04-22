@@ -53,10 +53,10 @@ router.patch('/', function (req, res) {
     }
 });
 
-router.delete('/', function (req, res) {
+router.delete('/:username', function (req, res) {
     const account = req.body;
 
-    db.get('accounts').remove({username: account.username}).write();
+    db.get('accounts').remove({username: req.params.username}).write();
     res.sendStatus(200);
 });
 
