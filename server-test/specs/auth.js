@@ -37,6 +37,7 @@ module.exports = describe('Authentication', function () {
             .end((err, res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.be.a('object');
+                expect(res.body).to.have.property('token');
                 done();
             });
     });
@@ -53,52 +54,33 @@ module.exports = describe('Authentication', function () {
                 done();
             });
     });
-    it('it success to resume auth session when user comeback', (done) => {
-        const agent = chai.request.agent(server.getExpressApp());
-        agent.post('/rest/auth/login')
+    it('it success to use token', (done) => {
+        chai.request(server.getExpressApp())
+            .post('/rest/auth/login')
             .send({
                 username: 'admin',
                 password: 'admin'
             })
-            .then(function () {
-                agent.get('/rest/auth/sync')
-                    .then(function (res) {
-                        expect(res).to.have.status(200);
-                        expect(res.body).to.be.a('object');
-                        expect(res.body).to.have.property('username').and.equal('admin');
-                        done();
-                    });
-            })
-    });
-    it('it fail to resume auth session when not logged in', (done) => {
-        const agent = chai.request.agent(server.getExpressApp());
-        agent.get('/rest/auth/sync')
-            .then(function (res) {
+            .then((res) => {
                 expect(res).to.have.status(200);
                 expect(res.body).to.be.a('object');
-                expect(res.body).to.be.empty;
-                done();
-            });
-    });
-    it('it success to logout', (done) => {
-        const agent = chai.request.agent(server.getExpressApp());
-        agent.post('/rest/auth/login')
-            .send({
-                username: 'admin',
-                password: 'admin'
+                expect(res.body).to.have.property('token');
+                return res.body.token;
             })
-            .then(function () {
-                agent.get('/rest/auth/logout')
-                    .then(function (res) {
+            .then((token) => {
+                chai.request(server.getExpressApp())
+                    .get('/rest/me').query({token: token})
+                    .end((err, res) => {
                         expect(res).to.have.status(200);
-                        expect(res.body).to.be.empty;
+                        expect(res.body).to.be.a('object');
+                        expect(res.body).to.have.property('password').and.equal('admin');
                         done();
                     });
-            })
+            });
     });
-    it('it fail to logout without login', (done) => {
+    it('it fail to use wrong token', (done) => {
         chai.request(server.getExpressApp())
-            .get('/rest/auth/logout')
+            .get('/rest/me').query({token: 'wrong token'})
             .end((err, res) => {
                 expect(res).to.have.status(401);
                 done();

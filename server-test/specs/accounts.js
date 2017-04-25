@@ -13,7 +13,8 @@ chai.use(require('chai-http'));
 
 module.exports = describe('Account management', () => {
     let server = undefined;
-    let adminLoggedInAgent = undefined;
+    let adminToken = undefined;
+    let userToken = undefined;
     const DB_FILE_PATH = __dirname + '/../resources/db.test.json';
 
     before(function (done) {
@@ -26,11 +27,19 @@ module.exports = describe('Account management', () => {
 
         server = new Server(config.server);
         server.start(() => {
-            adminLoggedInAgent = chai.request.agent(server.getExpressApp());
-            adminLoggedInAgent.post('/rest/auth/login').send({
+            chai.request(server.getExpressApp()).post('/rest/auth/login').send({
                 username: 'admin',
                 password: 'admin'
-            }).then(() => done());
+            }).then((res) => {
+                adminToken = res.body.token;
+                chai.request(server.getExpressApp()).post('/rest/auth/login').send({
+                    username: 'user',
+                    password: 'user'
+                }).then((res) => {
+                    userToken = res.body.token;
+                    done()
+                });
+            });
         });
     });
 
@@ -44,71 +53,65 @@ module.exports = describe('Account management', () => {
     });
 
     it('it fail when logged in but not admin', (done) => {
-        const agent = chai.request.agent(server.getExpressApp());
-        agent.post('/rest/auth/login')
-            .send({
-                username: 'user',
-                password: 'user'
-            })
-            .then(function () {
-                agent.get('/rest/accounts')
-                    .end(function (err, res) {
-                        expect(res).to.have.status(403);
-                        done();
-                    });
-            })
+        chai.request(server.getExpressApp())
+            .get('/rest/accounts').set('Authorization', 'Bearer ' + userToken)
+            .end(function (err, res) {
+                expect(res).to.have.status(403);
+                done();
+            });
     });
 
     it('it success when logged in with admin', (done) => {
-        const agent = chai.request.agent(server.getExpressApp());
-        agent.post('/rest/auth/login')
-            .send({
-                username: 'admin',
-                password: 'admin'
-            })
-            .then(function () {
-                agent.get('/rest/accounts')
-                    .end(function (err, res) {
-                        expect(res).to.have.status(200);
-                        done();
-                    });
-            })
+        chai.request(server.getExpressApp())
+            .get('/rest/accounts').set('Authorization', 'Bearer ' + adminToken)
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                done();
+            });
     });
 
     it('it success to create new account', (done) => {
-        adminLoggedInAgent.post('/rest/accounts').send({
-            username: 'test',
-            password: 'test',
-            roles: ['USER']
-        }).end(function (err, res) {
+        chai.request(server.getExpressApp())
+            .post('/rest/accounts').set('Authorization', 'Bearer ' + adminToken)
+            .send({
+                username: 'test',
+                password: 'test',
+                roles: ['USER']
+            }).end(function (err, res) {
             expect(res).to.have.status(200);
             done();
         });
     });
 
     it('it success to edit account', (done) => {
-        adminLoggedInAgent.patch('/rest/accounts').send({
-            username: 'test',
-            password: 'new_password',
-            roles: ['USER']
-        }).end(function (err, res) {
+        chai.request(server.getExpressApp())
+            .patch('/rest/accounts').set('Authorization', 'Bearer ' + adminToken)
+            .send({
+                username: 'test',
+                password: 'new_password',
+                roles: ['USER']
+            }).end(function (err, res) {
             expect(res).to.have.status(200);
             done();
         });
     });
 
     it('it success to delete account', (done) => {
-        adminLoggedInAgent.delete('/rest/accounts/test').end(function (err, res) {
-            expect(res).to.have.status(200);
-            done();
-        });
+        chai.request(server.getExpressApp())
+            .delete('/rest/accounts/test').set('Authorization', 'Bearer ' + adminToken)
+            .end(function (err, res) {
+                expect(res).to.have.status(200);
+                done();
+            });
     });
 
     it('it fail to delete non exist account', (done) => {
-        adminLoggedInAgent.delete('/rest/accounts/test').end(function (err, res) {
-            expect(res).to.have.status(500);
-            done();
-        });
+        chai.request(server.getExpressApp())
+            .delete('/rest/accounts/test').set('Authorization', 'Bearer ' + adminToken)
+            .end(function (err, res) {
+                expect(res).to.have.status(500);
+                done();
+            });
     });
 
     after(function (done) {

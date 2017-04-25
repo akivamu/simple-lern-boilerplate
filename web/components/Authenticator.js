@@ -1,26 +1,38 @@
 import axios from "axios";
 import _ from "lodash";
 
+function logout() {
+    axios.defaults.headers.common['Authorization'] = undefined;
+    window.sessionStorage.removeItem("account");
+}
+
 const Authenticator = {
     syncAuthenticationStatus: function (callback) {
+        const accountStr = window.sessionStorage.getItem("account");
+        if (accountStr) {
+            const account = JSON.parse(accountStr);
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + account.token;
+        }
+
         axios.get(API_URL + '/auth/sync')
             .then(function (response) {
-                if (response.data.username) {
+                if (response.data.token) {
                     window.sessionStorage.setItem("account", JSON.stringify(response.data));
                     callback(true);
                 } else {
-                    window.sessionStorage.removeItem("account");
+                    logout();
                     callback(false);
                 }
             })
             .catch(function (error) {
-                window.sessionStorage.removeItem("account");
+                logout();
                 callback(false);
             });
     },
     login: function (username, password, successCallback, errorCallback) {
         axios.post(API_URL + '/auth/login', {username: username, password: password})
             .then(function (response) {
+                axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token;
                 window.sessionStorage.setItem("account", JSON.stringify(response.data));
                 successCallback && successCallback();
             })
@@ -29,10 +41,7 @@ const Authenticator = {
             });
 
     },
-    logout: function () {
-        window.sessionStorage.removeItem("account");
-        axios.get(API_URL + '/auth/logout');
-    },
+    logout: logout,
     isLoggedIn: function () {
         try {
             return !!JSON.parse(window.sessionStorage.getItem("account"));

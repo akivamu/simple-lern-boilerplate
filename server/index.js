@@ -2,7 +2,6 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const sessionService = require('./services/session');
 const logger = require('./logger')(module);
 
 class Server {
@@ -18,17 +17,22 @@ class Server {
         this.app.all('*', function (req, res, next) {
             res.header('Access-Control-Allow-Credentials', true);
             res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            res.header("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
             next();
         });
 
-        this.app.use(sessionService.init(this.config.sessionCookieIdName));
+        this.app.options('*', function (req, res, next) {
+            res.sendStatus(200);
+        });
+
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: true}));
 
         // Rest
         this.app.use('/rest/auth', require('./rest/auth'));
         this.app.use('/rest/accounts', require('./rest/accounts'));
+        this.app.use('/rest/me', require('./rest/me'));
         this.app.use('/', require('./rest/common'));
     }
 

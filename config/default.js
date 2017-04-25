@@ -3,8 +3,10 @@ module.exports = {
         env: process.env.NODE_ENV || 'production',
         host: process.env.HOST || '0.0.0.0',
         port: process.env.PORT || 8080,
-        sessionCookieIdName: 'sid',
         dbType: process.env.DB_TYPE || 'lowdb',
+        auth: {
+            secret: 'SECRET'
+        },
         serveWeb: process.env.SERVE_WEB || 'false',
         log: {
             level: process.env.NODE_ENV === 'production' ? 'info' : 'debug'
