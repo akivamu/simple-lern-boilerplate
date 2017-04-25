@@ -22,7 +22,7 @@ export default class AccountsView extends React.Component {
     onAfterSaveCell(row, cellName, cellValue) {
         const that = this;
         row.roles = _.split(row.roles, ',');
-        axios.patch('/rest/accounts', row)
+        axios.patch(API_URL + '/accounts', row)
             .then(function () {
                 that.refresh();
             });
@@ -30,13 +30,13 @@ export default class AccountsView extends React.Component {
 
     onDeleteRow(rows) {
         rows.forEach(function (username) {
-            axios.delete('/rest/accounts/' + username);
+            axios.delete(API_URL + '/accounts/' + username);
         });
     }
 
     refresh() {
         const that = this;
-        axios.get('/rest/accounts').then(function (response) {
+        axios.get(API_URL + '/accounts').then(function (response) {
             that.setState({accounts: response.data});
         });
     }

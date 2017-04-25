@@ -1,3 +1,4 @@
+const config = require('config');
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -26,7 +27,9 @@ module.exports = {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify('development')
+            'process.env.NODE_ENV': JSON.stringify('development'),
+            API_URL: JSON.stringify(config.web.apiUrl),
+            SERVE_WEB: config.web.serveWeb === 'true'
         })
     ],
     module: {

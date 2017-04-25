@@ -1,17 +1,13 @@
 module.exports = {
     server: {
-        proxy_host: process.env.NODE_PROXY_HOST,
-        proxy_port: process.env.NODE_PROXY_PORT,
         env: process.env.NODE_ENV || 'production',
-        host: process.env.NODE_HOSTNAME || 'localhost',
-        port: process.env.NODE_PORT || 9000,
+        host: process.env.HOST || '0.0.0.0',
+        port: process.env.PORT || 8080,
         sessionCookieIdName: 'sid',
-        dbType: 'lowdb',
+        dbType: process.env.DB_TYPE || 'lowdb',
+        serveWeb: process.env.SERVE_WEB || 'false',
         log: {
             level: process.env.NODE_ENV === 'production' ? 'info' : 'debug'
-        },
-        autorep: {
-            maxHistoryComments: 200
         }
     },
     database: {
@@ -20,6 +16,7 @@ module.exports = {
         }
     },
     web: {
-        env: process.env.NODE_ENV || 'production'
+        env: process.env.NODE_ENV || 'production',
+        apiUrl: process.env.SERVE_WEB === 'true' ? '/rest' : process.env.REMOTE_API_URL || '/rest'
     }
 };

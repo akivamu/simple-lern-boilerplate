@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const Authenticator = {
     syncAuthenticationStatus: function (callback) {
-        axios.get('/rest/auth/sync')
+        axios.get(API_URL + '/auth/sync')
             .then(function (response) {
                 if (response.data.username) {
                     window.sessionStorage.setItem("account", JSON.stringify(response.data));
@@ -19,7 +19,7 @@ const Authenticator = {
             });
     },
     login: function (username, password, successCallback, errorCallback) {
-        axios.post('/rest/auth/login', {username: username, password: password})
+        axios.post(API_URL + '/auth/login', {username: username, password: password})
             .then(function (response) {
                 window.sessionStorage.setItem("account", JSON.stringify(response.data));
                 successCallback && successCallback();
@@ -31,7 +31,7 @@ const Authenticator = {
     },
     logout: function () {
         window.sessionStorage.removeItem("account");
-        axios.get('/rest/auth/logout');
+        axios.get(API_URL + '/auth/logout');
     },
     isLoggedIn: function () {
         try {

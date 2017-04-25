@@ -33,7 +33,7 @@ export default class CreateAccountView extends React.Component {
             roles: that.state.roles.split(',')
         };
 
-        axios.post('/rest/accounts', newAccount).then(function (response) {
+        axios.post(API_URL + '/accounts', newAccount).then(function (response) {
             that.resetState();
             that.props.onChange();
             that.setState({failMessage: ''});

@@ -1,3 +1,4 @@
+const config = require('config');
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -30,7 +31,9 @@ module.exports = {
         ]),
         new webpack.ContextReplacementPlugin(/moment[\/\\]locale$/, /en/),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+            API_URL: JSON.stringify(config.web.apiUrl),
+            SERVE_WEB: config.web.serveWeb === 'true'
         })
     ],
     module: {
